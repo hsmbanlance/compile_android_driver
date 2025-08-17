@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       android_version:
-        description: 'Android Version (Kernel) (e.g., 14)'
+        description: 'Android Version (Kernel) (e.g., 15)'
         required: true
       kernel_version:
         description: 'Kernel Version (e.g., 6.1)'
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Android Kernel source
         run: |
           mkdir -p android-kernel && cd android-kernel
-          repo init -u https://android.googlesource.com/kernel/manifest -b common-android${{ github.event.inputs.android_version }}-${{ github.event.inputs.kernel_version }}
+          repo init -u https://android.googlesource.com/kernel/manifest -b android-automotiveos-15.0.0_lts2
           repo sync -j$(nproc) -c --no-tags --optimized-fetch --force-sync
 
       - name: Copy kerneldriver
@@ -62,15 +62,15 @@ jobs:
             /_COMMON_GKI_MODULES_LIST = \[/ { in_list=1 }
             in_list && /\]/ {
               if (!added) {
-                print "    \"" module "\","
-                added=1
+                print "    \"" module "\",";
+                added=1;
               }
-              in_list=0
+              in_list=0;
             }
             in_list && !added {
               if (module < $0) {
-                print "    \"" module "\","
-                added=1
+                print "    \"" module "\",";
+                added=1;
               }
             }
             { print }
