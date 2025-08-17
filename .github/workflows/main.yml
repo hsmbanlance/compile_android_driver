@@ -38,7 +38,7 @@ jobs:
       - name: Set up Android Kernel source
         run: |
           mkdir -p android-kernel && cd android-kernel
-          repo init -u https://android.googlesource.com/kernel/manifest -b android-automotiveos-15.0.0_lts2
+          repo init -u https://android.googlesource.com/platform/manifest/ -b android-automotiveos-15.0.0_lts2
           repo sync -j$(nproc) -c --no-tags --optimized-fetch --force-sync
 
       - name: Copy kerneldriver
