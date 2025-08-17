@@ -81,14 +81,24 @@ jobs:
         run: |
           cd android-kernel
           echo "drivers/kerneldriver/${{ github.event.inputs.driver_name }}" >> common/android/gki_aarch64_modules
+
+      - name: Ensure output directory exists
+        if: ${{ github.event.inputs.android_version <= 13 }}
+        run: |
+          cd android-kernel
+          OUTPUT_PATH="out/android${{ github.event.inputs.android_version }}-${{ github.event.inputs.kernel_version }}"
+          mkdir -p $OUTPUT_PATH
+
       - name: Update modules.order for legacy builds
         if: ${{ github.event.inputs.android_version <= 13 }}
         run: |
           cd android-kernel
+          OUTPUT_PATH="out/android${{ github.event.inputs.android_version }}-${{ github.event.inputs.kernel_version }}"
           # Generate the new modules.order file
-          find common/drivers/kerneldriver/ -name '*.ko' | sed 's|common/drivers/||' | sort > out/android${{ github.event.inputs.android_version }}-${{ github.event.inputs.kernel_version }}/modules.order
+          find common/drivers/kerneldriver/ -name '*.ko' | sed 's|common/drivers/||' | sort > $OUTPUT_PATH/modules.order
           # Copy the new modules.order file to the correct location
-          cp out/android${{ github.event.inputs.android_version }}-${{ github.event.inputs.kernel_version }}/modules.order common/android/gki_aarch64_modules
+          cp $OUTPUT_PATH/modules.order common/android/gki_aarch64_modules
+          
       - name: Increase stack frame size limit
         run: |
           cd android-kernel
@@ -99,6 +109,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential flex bison libssl-dev libelf-dev bc python-is-python3
+          
       - name: Fix missing kprobe symbols for Android 13
         if: ${{ github.event.inputs.android_version == 13 }}
         run: |
@@ -122,7 +133,7 @@ jobs:
           fi
           echo "OUTPUT_PATH=$OUTPUT_PATH" >> $GITHUB_ENV
         continue-on-error: true
-      
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
