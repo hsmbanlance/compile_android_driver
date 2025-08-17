@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       android_version:
-        description: 'Android Version (Kernel) (e.g., 15)'
+        description: 'Android Version (Kernel) (e.g., 14 or 15)'
         required: true
       kernel_version:
         description: 'Kernel Version (e.g., 6.1)'
@@ -16,6 +16,9 @@ on:
         description: 'Target Architecture (aarch64, x86_64, etc.)'
         required: true
         default: 'aarch64'
+      lts_version:
+        description: 'LTS Version (e.g., lts2, lts3, etc.)'
+        required: true
 
 jobs:
   build:
@@ -38,7 +41,7 @@ jobs:
       - name: Set up Android Kernel source
         run: |
           mkdir -p android-kernel && cd android-kernel
-          repo init -u https://android.googlesource.com/platform/manifest/ -b android-automotiveos-15.0.0_lts2
+          repo init -u https://android.googlesource.com/platform/manifest/ -b android-automotiveos-${{ github.event.inputs.android_version }}.0.0_${{ github.event.inputs.lts_version }}
           repo sync -j$(nproc) -c --no-tags --optimized-fetch --force-sync
 
       - name: Copy kerneldriver
